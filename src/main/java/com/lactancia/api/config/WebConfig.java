@@ -14,6 +14,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**") // Aplica CORS a todos los endpoints bajo /api
                        // .allowedOrigins("http://localhost:3000") // Cambia esto si React corre en otro puerto
+                	    .allowedOrigins("*") 
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
