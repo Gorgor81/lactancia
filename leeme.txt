@@ -1,2 +1,13 @@
 ### git coses
 
+git add .
+
+## o bé
+
+git add nombre_del_archivo
+
+
+
+git commit -m "misssatge"
+
+git push origin main
