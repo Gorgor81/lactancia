@@ -1,22 +1,23 @@
-# Imagen base con Maven para compilar el proyecto
-FROM maven:3.8.6-eclipse-temurin-17 AS build
+# Etapa 1: Compilar el proyecto
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copiar los archivos del proyecto y compilar
+# Copiar archivos y compilar
 COPY pom.xml .
-RUN mvn dependency:go-offline  # Descarga dependencias para evitar fallos de red
-COPY src ./src
-RUN mvn clean package -DskipTests  # Construye el JAR
+RUN mvn dependency:go-offline
 
-# Imagen final con Java para ejecutar el JAR
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Etapa 2: Ejecutar la aplicación
 FROM eclipse-temurin:17
 WORKDIR /app
 
-# Copiar el JAR desde la imagen de construcción
+# Copiar el JAR desde la etapa de compilación
 COPY --from=build /app/target/*.jar app.jar
 
-# Exponer el puerto en el que corre Spring Boot
+# Exponer el puerto de la app
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# Ejecutar la aplicación
+CMD ["java", "-jar", "app.jar"]
