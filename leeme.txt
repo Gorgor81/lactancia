@@ -21,3 +21,10 @@ git push origin main
 - Filtro de autenticación para validar el token en cada petición.
 
 
+###new repo
+
+git add .
+git commit -m "Primer commit después de reiniciar el repo"
+git branch -M main
+git remote add origin https://github.com/Gorgor81/lactancia.git
+git push -u origin main
