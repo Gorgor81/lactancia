@@ -1,0 +1,23 @@
+### git coses
+
+git add .
+
+## o bé
+
+git add nombre_del_archivo
+
+
+
+git commit -m "misssatge"
+
+git push origin main
+
+
+#### spring security
+
+- Configuración de Spring Security para proteger las rutas.
+- Generación y validación de tokens JWT.
+- Endpoints de login y registro de usuarios.
+- Filtro de autenticación para validar el token en cada petición.
+
+
