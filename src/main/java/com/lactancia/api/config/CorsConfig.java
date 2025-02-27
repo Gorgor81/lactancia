@@ -14,11 +14,11 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Permitir todas las rutas
-                        /*.allowedOrigins(
+                        .allowedOrigins(
                                 "http://localhost:5173", // Desarrollo en local (Vite)
                                 "https://lactancia-645f4.web.app" // Producción en Firebase Hosting
-                        )*/
-                        .allowedOriginPatterns("*") // Permite cualquier origen
+                        )
+                        //.allowedOriginPatterns("*") // Permite cualquier origen
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos permitidos
                         .allowedHeaders("*") // Permitir todos los headers
                         .allowCredentials(true); // Permitir cookies si las necesitas
