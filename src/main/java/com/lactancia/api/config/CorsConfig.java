@@ -1,4 +1,5 @@
 package com.lactancia.api.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -12,12 +13,15 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        //.allowedOrigins("https://lactancia-645f4.web.app", "http://localhost:5173") 
-                		.allowedOriginPatterns("*") // Permite cualquier origen
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                registry.addMapping("/**") // Permitir todas las rutas
+                        /*.allowedOrigins(
+                                "http://localhost:5173", // Desarrollo en local (Vite)
+                                "https://lactancia-645f4.web.app" // Producción en Firebase Hosting
+                        )*/
+                        .allowedOriginPatterns("*") // Permite cualquier origen
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos permitidos
+                        .allowedHeaders("*") // Permitir todos los headers
+                        .allowCredentials(true); // Permitir cookies si las necesitas
             }
         };
     }

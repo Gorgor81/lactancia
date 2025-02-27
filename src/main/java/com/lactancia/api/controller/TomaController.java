@@ -1,7 +1,9 @@
 package com.lactancia.api.controller;
 
+import com.google.firebase.auth.FirebaseToken;
 import com.lactancia.api.entity.Toma;
 import com.lactancia.api.entity.Usuario;
+import com.lactancia.api.service.FirebaseAuthService;
 import com.lactancia.api.service.TomaService;
 import com.lactancia.api.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +27,9 @@ public class TomaController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private FirebaseAuthService firebaseAuthService;
 
     // Obtener todas las tomas del usuario autenticado
     @GetMapping
@@ -92,5 +98,29 @@ public class TomaController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    
+    
+    @GetMapping("/tomas")
+    public ResponseEntity<String> obtenerTomas(HttpServletRequest request) {
+        String token = extractToken(request);
+        if (token == null) {
+            return ResponseEntity.status(401).body("No token provided");
+        }
+
+        try {
+            FirebaseToken decodedToken = firebaseAuthService.verifyToken(token);
+            return ResponseEntity.ok("Acceso permitido para: " + decodedToken.getUid());
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Invalid token");
+        }
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
     }
 }
