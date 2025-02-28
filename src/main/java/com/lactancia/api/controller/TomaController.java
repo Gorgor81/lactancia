@@ -1,126 +1,57 @@
 package com.lactancia.api.controller;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.google.firebase.auth.FirebaseToken;
 import com.lactancia.api.entity.Toma;
 import com.lactancia.api.entity.Usuario;
 import com.lactancia.api.service.FirebaseAuthService;
 import com.lactancia.api.service.TomaService;
 import com.lactancia.api.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tomas")
 public class TomaController {
 
-    @Autowired
-    private TomaService tomaService;
+	@Autowired
+	private TomaService tomaService;
 
-    @Autowired
-    private UsuarioService usuarioService;
+	@GetMapping("/{usuarioId}")
+	public List<Toma> getTomasByUsuario(@PathVariable Long usuarioId) {
+		return tomaService.getTomasByUsuario(usuarioId);
+	}
 
-    @Autowired
-    private FirebaseAuthService firebaseAuthService;
+	@PostMapping("/{usuarioId}")
+	public ResponseEntity<Toma> createToma(@PathVariable Long usuarioId, @RequestBody Toma toma) {
+		return ResponseEntity.ok(tomaService.saveToma(usuarioId, toma));
+	}
 
-    // Obtener todas las tomas del usuario autenticado
-    @GetMapping
-    public List<Toma> getTomas() {
-        // Obtener el nombre de usuario desde el contexto de seguridad
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+	@PutMapping("/{id}")
+	public ResponseEntity<Toma> updateToma(@PathVariable Long id, @RequestBody Toma toma) {
+		return ResponseEntity.ok(tomaService.updateToma(id, toma));
+	}
 
-        // Buscar el usuario autenticado
-        Usuario usuario = usuarioService.getUsuarioByUsername(username);
-
-        // Si el usuario no existe, devolver un error
-        if (usuario == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
-        }
-
-        // Filtrar las tomas del usuario
-        return tomaService.getTomasByUsuario(usuario);
-    }
-
-    // Obtener una toma por su ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Toma> getTomaById(@PathVariable Long id) {
-        Optional<Toma> toma = tomaService.getTomaById(id);
-        return toma.map(ResponseEntity::ok)
-                   .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    // Crear una nueva toma
-    @PostMapping
-    @Transactional
-    public ResponseEntity<Toma> createToma(@RequestBody Toma toma) {
-        // Obtener el usuario autenticado
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Usuario usuario = usuarioService.getUsuarioByUsername(username);
-
-        if (usuario == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
-        }
-
-        // Asociar el usuario autenticado con la nueva toma
-        toma.setUsuario(usuario);
-
-        // Verificar si ya existe una toma con la misma fecha, tipo y usuario
-        if (tomaService.existsByUsuarioAndFechaAndTipo(usuario, toma.getFecha(), toma.getTipo())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe una toma para este usuario en esta fecha");
-        }
-
-        // Crear la nueva toma
-        Toma nuevaToma = tomaService.createToma(toma);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaToma);
-    }
-
-    // Actualizar una toma existente
-    @PutMapping("/{id}")
-    public ResponseEntity<Toma> updateToma(@PathVariable Long id, @RequestBody Toma toma) {
-        Optional<Toma> updatedToma = tomaService.updateToma(id, toma);
-        return updatedToma.map(ResponseEntity::ok)
-                          .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    // Eliminar una toma
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteToma(@PathVariable Long id) {
-        boolean deleted = tomaService.deleteToma(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    
-    
-    @GetMapping("/tomas")
-    public ResponseEntity<String> obtenerTomas(HttpServletRequest request) {
-        String token = extractToken(request);
-        if (token == null) {
-            return ResponseEntity.status(401).body("No token provided");
-        }
-
-        try {
-            FirebaseToken decodedToken = firebaseAuthService.verifyToken(token);
-            return ResponseEntity.ok("Acceso permitido para: " + decodedToken.getUid());
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Invalid token");
-        }
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        return null;
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteToma(@PathVariable Long id) {
+		tomaService.deleteToma(id);
+		return ResponseEntity.noContent().build();
+	}
 }

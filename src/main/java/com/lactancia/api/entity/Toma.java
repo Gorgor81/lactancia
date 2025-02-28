@@ -11,75 +11,80 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "tomas")
 public class Toma {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String tipo;
-    private int duracion;
-    private String fecha;
-    private String notas;
-    private int cantidad;
-    
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
-    
-    // Getters y setters
-    
-    public Long getId() {
-        return id;
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String fecha;
+	private String tipo;
+	private Integer cantidad;
+	private Integer duracion;
+	private String notas;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	@ManyToOne
+	@JoinColumn(name = "usuario_id")
+	private Usuario usuario;
 
-    public String getTipo() {
-        return tipo;
-    }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
+	// Getters y Setters
 
-    public int getDuracion() {
-        return duracion;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setDuracion(int duracion) {
-        this.duracion = duracion;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getFecha() {
-        return fecha;
-    }
+	public String getFecha() {
+		return fecha;
+	}
 
-    public void setFecha(String fecha) {
-        this.fecha = fecha;
-    }
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
 
-    public String getNotas() {
-        return notas;
-    }
+	public String getTipo() {
+		return tipo;
+	}
 
-    public void setNotas(String notas) {
-        this.notas = notas;
-    }
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
 
-    public int getCantidad() {
-        return cantidad;
-    }
+	public Integer getCantidad() {
+		return cantidad;
+	}
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+	public Integer getDuracion() {
+		return duracion;
+	}
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+	public void setDuracion(Integer duracion) {
+		this.duracion = duracion;
+	}
+
+	public String getNotas() {
+		return notas;
+	}
+
+	public void setNotas(String notas) {
+		this.notas = notas;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+
+
+
+
 }

@@ -10,9 +10,5 @@ import java.util.List;
 @Repository
 public interface TomaRepository extends JpaRepository<Toma, Long> {
 
-    // Buscar tomas por usuario
-    List<Toma> findByUsuario(Usuario usuario);
-
-    // Verificar si existe una toma para un usuario, fecha y tipo específicos
-    boolean existsByUsuarioAndFechaAndTipo(Usuario usuario, String fecha, String tipo);
+	 List<Toma> findByUsuarioId(Long usuarioId);
 }

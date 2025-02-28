@@ -1,55 +1,44 @@
 package com.lactancia.api.service;
 
-import com.lactancia.api.entity.Toma;
-import com.lactancia.api.entity.Usuario;
-import com.lactancia.api.repository.TomaRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lactancia.api.entity.Toma;
+import com.lactancia.api.entity.Usuario;
+import com.lactancia.api.repository.TomaRepository;
+import com.lactancia.api.repository.UsuarioRepository;
 
 @Service
 public class TomaService {
 
-    @Autowired
-    private TomaRepository tomaRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private TomaRepository tomaRepository;
 
-    // Obtener todas las tomas del usuario
-    public List<Toma> getTomasByUsuario(Usuario usuario) {
-        return tomaRepository.findByUsuario(usuario);
-    }
+	public List<Toma> getTomasByUsuario(Long usuarioId) {
+		return tomaRepository.findByUsuarioId(usuarioId);
+	}
 
-    // Obtener una toma por su ID
-    public Optional<Toma> getTomaById(Long id) {
-        return tomaRepository.findById(id);
-    }
+	public Toma saveToma(Long usuarioId, Toma toma) {
+		Usuario usuario = usuarioRepository.findById(usuarioId)
+				.orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+		toma.setUsuario(usuario);
+		return tomaRepository.save(toma);
+	}
 
-    // Crear una nueva toma
-    public Toma createToma(Toma toma) {
-        return tomaRepository.save(toma);
-    }
+	public Toma updateToma(Long id, Toma toma) {
+		if (tomaRepository.existsById(id)) {
+			toma.setId(id);
+			return tomaRepository.save(toma);
+		}
+		throw new RuntimeException("Toma no encontrada");
+	}
 
-    // Actualizar una toma existente
-    public Optional<Toma> updateToma(Long id, Toma toma) {
-        if (tomaRepository.existsById(id)) {
-            toma.setId(id);
-            return Optional.of(tomaRepository.save(toma));
-        }
-        return Optional.empty();
-    }
-
-    // Eliminar una toma
-    public boolean deleteToma(Long id) {
-        if (tomaRepository.existsById(id)) {
-            tomaRepository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
-
-    // Comprobar si existe una toma para un usuario, fecha y tipo específicos
-    public boolean existsByUsuarioAndFechaAndTipo(Usuario usuario, String fecha, String tipo) {
-        return tomaRepository.existsByUsuarioAndFechaAndTipo(usuario, fecha, tipo);
-    }
+	public void deleteToma(Long id) {
+		tomaRepository.deleteById(id);
+	}
 }

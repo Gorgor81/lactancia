@@ -1,58 +1,41 @@
 package com.lactancia.api.controller;
 
-import com.lactancia.api.entity.Usuario;
-import com.lactancia.api.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lactancia.api.entity.Usuario;
+import com.lactancia.api.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-
+    
     @Autowired
     private UsuarioService usuarioService;
-
-    // Obtener todos los usuarios
+    
     @GetMapping
     public List<Usuario> getUsuarios() {
-        return usuarioService.getAllUsuarios();
+        return usuarioService.getUsuarios();
     }
-
-    // Obtener un usuario por su ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioService.getUsuarioById(id);
-        return usuario.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    // Crear un nuevo usuario
+    
     @PostMapping
     public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario) {
-        Usuario nuevoUsuario = usuarioService.createUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
+        return ResponseEntity.ok(usuarioService.saveUsuario(usuario));
     }
-
-    // Actualizar un usuario existente
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        Optional<Usuario> updatedUsuario = usuarioService.updateUsuario(id, usuario);
-        return updatedUsuario.map(ResponseEntity::ok)
-                             .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    // Eliminar un usuario
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
-        boolean deleted = usuarioService.deleteUsuario(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        usuarioService.deleteUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 }

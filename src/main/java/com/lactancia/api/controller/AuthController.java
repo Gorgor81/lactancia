@@ -1,22 +1,31 @@
 package com.lactancia.api.controller;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class AuthController {
+import com.lactancia.api.entity.Usuario;
+import com.lactancia.api.service.UsuarioService;
 
-    @GetMapping("/verify-token")
-    public String verifyToken(@RequestHeader("Authorization") String token) {
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-            String uid = decodedToken.getUid();
-            return "Token válido para el usuario con ID: " + uid;
-        } catch (Exception e) {
-            return "Token inválido: " + e.getMessage();
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    
+    @Autowired
+    private UsuarioService usuarioService;
+    
+    @PostMapping("/login")
+    public ResponseEntity<Usuario> login(@RequestBody LoginRequest loginRequest) {
+        Optional<Usuario> usuario = usuarioService.validarUsuario(loginRequest.getEmail(), loginRequest.getPassword());
+        if (usuario.isPresent()) {
+            return ResponseEntity.ok(usuario.get()); // Devuelve el usuario autenticado
+        } else {
+            return ResponseEntity.status(401).body(null);
         }
     }
 }
